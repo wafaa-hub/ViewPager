@@ -1,8 +1,5 @@
 package com.example.viewpagerexample;
 
-/**
- * Created by anupamchugh on 26/12/15.
- */
 public enum ModelObject {
 
     RED(R.string.red, R.layout.view_red),

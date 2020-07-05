@@ -1,33 +1,34 @@
 package com.example.viewpagerexample;
 
-import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
-import androidx.viewpager.widget.PagerAdapter;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
 
-public class CustomPagerAdapter extends PagerAdapter {
+public class CustomPagerAdapter extends FragmentPagerAdapter {
 
-    private Context mContext;
 
-    public CustomPagerAdapter(Context context) {
-        mContext = context;
+    public CustomPagerAdapter(FragmentManager fragmentManager){
+        super(fragmentManager);
     }
 
+    @NonNull
     @Override
-    public Object instantiateItem(ViewGroup collection, int position) {
-        ModelObject modelObject = ModelObject.values()[position];
-        LayoutInflater inflater = LayoutInflater.from(mContext);
-        ViewGroup layout = (ViewGroup) inflater.inflate(modelObject.getLayoutResId(), collection, false);
-        collection.addView(layout);
-        return layout;
+    public Fragment getItem(int position) {
+        switch (position) {
+            case 0:
+                return RedFragment.newInstance(0, "Red");
+            case 1:
+                return GreenFragment.newInstance(1, "Green");
+            case 2:
+                return BlueFragment.newInstance(2, "Blue");
+            default:
+                return null;
+        }
     }
 
-    @Override
-    public void destroyItem(ViewGroup collection, int position, Object view) {
-        collection.removeView((View) view);
-    }
+
 
     @Override
     public int getCount() {
@@ -35,15 +36,9 @@ public class CustomPagerAdapter extends PagerAdapter {
     }
 
     @Override
-    public boolean isViewFromObject(View view, Object object) {
-        return view == object;
-    }
-
-    @Override
     public CharSequence getPageTitle(int position) {
-        ModelObject customPagerEnum = ModelObject.values()[position];
-
-        return mContext.getString(customPagerEnum.getTitleResId());
+        position++;
+        return "View " + position;
     }
 
 }
