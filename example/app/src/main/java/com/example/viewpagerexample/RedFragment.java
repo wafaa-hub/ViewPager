@@ -13,11 +13,11 @@ public class RedFragment extends Fragment {
     private String title;
 
     public static RedFragment newInstance(int page, String title) {
-        RedFragment blueFragment = new RedFragment ();
+        RedFragment redFragment = new RedFragment ();
         Bundle args = new Bundle();
         args.putString("someTitle", title);
-        blueFragment.setArguments(args);
-        return blueFragment;
+        redFragment.setArguments(args);
+        return redFragment;
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
