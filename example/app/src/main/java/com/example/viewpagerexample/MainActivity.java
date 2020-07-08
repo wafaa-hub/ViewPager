@@ -3,9 +3,14 @@ package com.example.viewpagerexample;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.PagerTabStrip;
 import androidx.viewpager.widget.ViewPager;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.ImageSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,11 +21,13 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    static CustomPagerAdapter adapterViewPager;
+    CustomPagerAdapter adapterViewPager;
     ViewPager vpPager;
     Button addView;
     Button deleteView;
     RelativeLayout view;
+    PagerTabStrip pagerTabStrip;
+    Drawable removePage ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,11 +37,11 @@ public class MainActivity extends AppCompatActivity {
         vpPager = findViewById (R.id.viewpager1);
         addView = findViewById (R.id.add_view);
         deleteView = findViewById (R.id.delete_view);
+        pagerTabStrip = findViewById (R.id.pager_header);
         adapterViewPager = new CustomPagerAdapter ( );
         vpPager.setAdapter (adapterViewPager);
         LayoutInflater inflater = getLayoutInflater ( );
-
-
+        
         view = (RelativeLayout) inflater.inflate (R.layout.page, null);
 
         addView.setOnClickListener (new View.OnClickListener ( ) {
@@ -59,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public static class CustomPagerAdapter extends PagerAdapter {
+    public class CustomPagerAdapter extends PagerAdapter {
 
         private ArrayList<View> views = new ArrayList<View> ( );
 
@@ -70,8 +77,14 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public CharSequence getPageTitle(int position) {
-            position++;
-            return "Page " + position;
+
+            SpannableStringBuilder sb = new SpannableStringBuilder (" Page #" + (position + 1));
+            removePage = getApplicationContext ( ).getDrawable (R.drawable.remove_page);
+            removePage.setBounds (0, 15, 60, 50);
+            ImageSpan span = new ImageSpan (removePage, ImageSpan.ALIGN_BASELINE);
+            sb.setSpan (span, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            return sb;
+
         }
 
         @Override
@@ -86,11 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public int getItemPosition(Object object) {
-            int index = views.indexOf (object);
-            if (index == -1)
-                return POSITION_NONE;
-            else
-                return index;
+            return PagerAdapter.POSITION_NONE;
         }
 
         @NonNull
