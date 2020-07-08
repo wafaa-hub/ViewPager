@@ -10,8 +10,10 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
+import android.text.style.ClickableSpan;
 import android.text.style.ImageSpan;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -28,7 +30,8 @@ public class MainActivity extends AppCompatActivity {
     RelativeLayout view;
     PagerTabStrip pagerTabStrip;
     Drawable removePage ;
-
+    ClickableSpan clickableSpan;
+    ImageSpan span;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate (savedInstanceState);
@@ -41,8 +44,17 @@ public class MainActivity extends AppCompatActivity {
         adapterViewPager = new CustomPagerAdapter ( );
         vpPager.setAdapter (adapterViewPager);
         LayoutInflater inflater = getLayoutInflater ( );
-        
+
         view = (RelativeLayout) inflater.inflate (R.layout.page, null);
+
+        pagerTabStrip.setOnTouchListener (new View.OnTouchListener ( ) {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                clickableSpan.onClick (view);
+                return false;
+            }
+        });
+
 
         addView.setOnClickListener (new View.OnClickListener ( ) {
             @Override
@@ -64,6 +76,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        clickableSpan = new ClickableSpan ( ) {
+            @Override
+
+            public void onClick(@NonNull View widget) {
+                if (adapterViewPager.getCount ( ) > 0) {
+                    int pageIndex = adapterViewPager.removeView (vpPager, view);
+                    if (pageIndex == adapterViewPager.getCount ( ))
+                        pageIndex--;
+                    vpPager.setCurrentItem (pageIndex);
+                }
+            }
+        };
     }
 
     public class CustomPagerAdapter extends PagerAdapter {
@@ -76,15 +100,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public CharSequence getPageTitle(int position) {
+        public CharSequence getPageTitle(final int position) {
 
             SpannableStringBuilder sb = new SpannableStringBuilder (" Page #" + (position + 1));
             removePage = getApplicationContext ( ).getDrawable (R.drawable.remove_page);
             removePage.setBounds (0, 15, 60, 50);
-            ImageSpan span = new ImageSpan (removePage, ImageSpan.ALIGN_BASELINE);
+            span = new ImageSpan (removePage, ImageSpan.ALIGN_BASELINE);
             sb.setSpan (span, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             return sb;
-
         }
 
         @Override
