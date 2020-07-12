@@ -1,23 +1,23 @@
 package com.example.viewpagerexample;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.PagerTabStrip;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.style.ClickableSpan;
+import android.text.SpannableString;
 import android.text.style.ImageSpan;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.RelativeLayout;
+
+import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
 
@@ -27,137 +27,102 @@ public class MainActivity extends AppCompatActivity {
     ViewPager vpPager;
     Button addView;
     Button deleteView;
-    RelativeLayout view;
-    PagerTabStrip pagerTabStrip;
-    Drawable removePage ;
-    ClickableSpan clickableSpan;
-    ImageSpan span;
+    TabLayout tabLayout;
+    public static final String FRAGMENT_TAG_ARG = "tag";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate (savedInstanceState);
         setContentView (R.layout.activity_main);
 
-        vpPager = findViewById (R.id.viewpager1);
+        vpPager = findViewById (R.id.viewPager);
         addView = findViewById (R.id.add_view);
         deleteView = findViewById (R.id.delete_view);
-        pagerTabStrip = findViewById (R.id.pager_header);
-        adapterViewPager = new CustomPagerAdapter ( );
+        tabLayout = findViewById (R.id.tabLayout);
+        adapterViewPager = new CustomPagerAdapter (getSupportFragmentManager ( ));
         vpPager.setAdapter (adapterViewPager);
-        LayoutInflater inflater = getLayoutInflater ( );
-
-        view = (RelativeLayout) inflater.inflate (R.layout.page, null);
-
-        pagerTabStrip.setOnTouchListener (new View.OnTouchListener ( ) {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                clickableSpan.onClick (view);
-                return false;
-            }
-        });
-
+        tabLayout.setupWithViewPager (vpPager);
 
         addView.setOnClickListener (new View.OnClickListener ( ) {
             @Override
             public void onClick(View v) {
-                int pageIndex = adapterViewPager.addView (view);
-                vpPager.setCurrentItem (pageIndex, true);
+                adapterViewPager.addFragment (PageFragment.newInstance ( ), "Page " + (adapterViewPager.getCount ( ) + 1), adapterViewPager.getCount ( ));
+
             }
         });
 
         deleteView.setOnClickListener (new View.OnClickListener ( ) {
             @Override
             public void onClick(View v) {
-                if (adapterViewPager.getCount ( ) > 0) {
-                    int pageIndex = adapterViewPager.removeView (vpPager, view);
-                    if (pageIndex == adapterViewPager.getCount ( ))
-                        pageIndex--;
-                    vpPager.setCurrentItem (pageIndex);
+                if (adapterViewPager.getCount ( ) > 0 && tabLayout.getSelectedTabPosition() > -1) {
+                    adapterViewPager.removeFragment ( tabLayout.getSelectedTabPosition ());
+
                 }
             }
         });
 
-        clickableSpan = new ClickableSpan ( ) {
+        tabLayout.addOnTabSelectedListener (new TabLayout.OnTabSelectedListener ( ) {
             @Override
+            public void onTabSelected(TabLayout.Tab tab) {
 
-            public void onClick(@NonNull View widget) {
-                if (adapterViewPager.getCount ( ) > 0) {
-                    int pageIndex = adapterViewPager.removeView (vpPager, view);
-                    if (pageIndex == adapterViewPager.getCount ( ))
-                        pageIndex--;
-                    vpPager.setCurrentItem (pageIndex);
-                }
             }
-        };
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                if (adapterViewPager.getCount ( ) > 0 && tabLayout.getSelectedTabPosition() > -1)
+                    adapterViewPager.removeFragment (tab.getPosition ());
+
+            }
+        });
     }
 
-    public class CustomPagerAdapter extends PagerAdapter {
+    public class CustomPagerAdapter extends FragmentStatePagerAdapter {
 
-        private ArrayList<View> views = new ArrayList<View> ( );
+        private ArrayList<Fragment> fragments = new ArrayList<Fragment> ( );
+        private ArrayList<String> fragmentsTitle = new ArrayList<String> ( );
+
+        public CustomPagerAdapter(@NonNull FragmentManager fm) {
+            super (fm);
+        }
 
         @Override
         public int getCount() {
-            return views.size ( );
-        }
-
-        @Override
-        public CharSequence getPageTitle(final int position) {
-
-            SpannableStringBuilder sb = new SpannableStringBuilder (" Page #" + (position + 1));
-            removePage = getApplicationContext ( ).getDrawable (R.drawable.remove_page);
-            removePage.setBounds (0, 15, 60, 50);
-            span = new ImageSpan (removePage, ImageSpan.ALIGN_BASELINE);
-            sb.setSpan (span, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            return sb;
-        }
-
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object view) {
-            container.removeView (views.get (position));
-        }
-
-        @Override
-        public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
-            return view == object;
-        }
-
-        @Override
-        public int getItemPosition(Object object) {
-            return PagerAdapter.POSITION_NONE;
+            return fragments.size ( );
         }
 
         @NonNull
         @Override
-        public Object instantiateItem(@NonNull ViewGroup container, int position) {
-            View v = views.get (position);
-            if (v.getParent ( ) != null) {
-                ((ViewGroup) v.getParent ( )).removeView (v);
-            }
-            container.addView (v);
-            return v;
+        public Fragment getItem(int position) {
+            return fragments.get (position);
         }
 
-        public int addView(View v, int position) {
-            views.add (position, v);
+        public void addFragment(Fragment fragment, String title, int position) {
+            fragments.add (fragment);
+            fragmentsTitle.add (position, title);
             adapterViewPager.notifyDataSetChanged ( );
-            return position;
         }
 
-        public int addView(View v) {
-            return addView (v, views.size ( ));
-        }
 
-        public int removeView(ViewPager pager, View v) {
-            return removeView (pager, views.indexOf (v));
-        }
-
-        public int removeView(ViewPager pager, int position) {
-            pager.setAdapter (null);
-            views.remove (position);
-            pager.setAdapter (this);
+        public void removeFragment( int position) {
+            fragments.remove (position);
+            fragmentsTitle.remove (position);
             adapterViewPager.notifyDataSetChanged ( );
-            return position;
+        }
+
+        @Nullable
+        @Override
+        public CharSequence getPageTitle(int position) {
+            Drawable image = ContextCompat.getDrawable (MainActivity.this, R.drawable.close);
+            image.setBounds (0, 15, 60, 50);
+            SpannableString sb = new SpannableString (" " + fragmentsTitle.get (position));
+            ImageSpan imageSpan = new ImageSpan (image, ImageSpan.ALIGN_BASELINE);
+            sb.setSpan (imageSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            return sb;
         }
     }
-
-
 }

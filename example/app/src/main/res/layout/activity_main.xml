@@ -1,51 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".MainActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:tabIndicatorColor="#000000"
+        app:tabTextColor="#000000"
+        app:tabMode="scrollable"
+        app:tabGravity="fill"
+        android:background="@drawable/background_btn"/>
+
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="650dp"
+        android:layout_below="@+id/tabLayout"
+        android:background="@color/background_view_pager"/>
 
     <LinearLayout
         android:id="@+id/add_view_layout"
         android:layout_width="match_parent"
-        android:layout_height="45dp"
+        android:layout_height="wrap_content"
         android:gravity="center"
+        android:layout_below="@+id/viewPager"
         android:orientation="horizontal">
 
         <Button
             android:id="@+id/add_view"
+            android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:background="@drawable/background_btn"
             android:text="Add Page" />
 
         <Button
             android:id="@+id/delete_view"
+            android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:background="@drawable/background_btn"
             android:text="Delete Page" />
 
     </LinearLayout>
 
-    <androidx.viewpager.widget.ViewPager
-        android:id="@+id/viewpager1"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/background_view_pager"
-        android:layout_marginTop="45dp">
-
-        <androidx.viewpager.widget.PagerTabStrip
-            android:id="@+id/pager_header"
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:background="@color/background_view_pager_title"
-            android:layout_marginBottom="30dp"/>
-
-    </androidx.viewpager.widget.ViewPager>
-
-
-</FrameLayout>
+</RelativeLayout>
