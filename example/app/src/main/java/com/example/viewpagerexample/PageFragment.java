@@ -17,7 +17,6 @@ public class PageFragment extends Fragment {
     public static PageFragment newInstance() {
         PageFragment fragment = new PageFragment();
         Bundle args = new Bundle();
-        args.putString(MainActivity.FRAGMENT_TAG_ARG, "_" + fragment.hashCode());
         fragment.setArguments(args);
         return fragment;
     }

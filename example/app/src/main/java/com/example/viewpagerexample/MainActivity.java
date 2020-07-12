@@ -23,27 +23,26 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    CustomPagerAdapter adapterViewPager;
-    ViewPager vpPager;
-    Button addView;
-    Button deleteView;
+    CustomViewPagerAdapter adapterViewPager;
+    ViewPager viewPager;
+    Button addFragmentBtn;
+    Button deleteFragmentBtn;
     TabLayout tabLayout;
-    public static final String FRAGMENT_TAG_ARG = "tag";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate (savedInstanceState);
         setContentView (R.layout.activity_main);
 
-        vpPager = findViewById (R.id.viewPager);
-        addView = findViewById (R.id.add_view);
-        deleteView = findViewById (R.id.delete_view);
+        viewPager = findViewById (R.id.viewPager);
+        addFragmentBtn = findViewById (R.id.add_view);
+        deleteFragmentBtn = findViewById (R.id.delete_view);
         tabLayout = findViewById (R.id.tabLayout);
-        adapterViewPager = new CustomPagerAdapter (getSupportFragmentManager ( ));
-        vpPager.setAdapter (adapterViewPager);
-        tabLayout.setupWithViewPager (vpPager);
+        adapterViewPager = new CustomViewPagerAdapter (getSupportFragmentManager ( ));
+        viewPager.setAdapter (adapterViewPager);
+        tabLayout.setupWithViewPager (viewPager);
 
-        addView.setOnClickListener (new View.OnClickListener ( ) {
+        addFragmentBtn.setOnClickListener (new View.OnClickListener ( ) {
             @Override
             public void onClick(View v) {
                 adapterViewPager.addFragment (PageFragment.newInstance ( ), "Page " + (adapterViewPager.getCount ( ) + 1), adapterViewPager.getCount ( ));
@@ -51,11 +50,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        deleteView.setOnClickListener (new View.OnClickListener ( ) {
+        deleteFragmentBtn.setOnClickListener (new View.OnClickListener ( ) {
             @Override
             public void onClick(View v) {
-                if (adapterViewPager.getCount ( ) > 0 && tabLayout.getSelectedTabPosition() > -1) {
-                    adapterViewPager.removeFragment ( tabLayout.getSelectedTabPosition ());
+                if (adapterViewPager.getCount ( ) > 0 && tabLayout.getSelectedTabPosition ( ) > -1) {
+                    adapterViewPager.removeFragment (tabLayout.getSelectedTabPosition ( ));
 
                 }
             }
@@ -64,29 +63,26 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.addOnTabSelectedListener (new TabLayout.OnTabSelectedListener ( ) {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-
+                viewPager.setCurrentItem(tab.getPosition());
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
+            public void onTabUnselected(TabLayout.Tab tab) { }
 
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
-                if (adapterViewPager.getCount ( ) > 0 && tabLayout.getSelectedTabPosition() > -1)
-                    adapterViewPager.removeFragment (tab.getPosition ());
-
+                if (adapterViewPager.getCount ( ) > 0 && tabLayout.getSelectedTabPosition ( ) > -1)
+                    adapterViewPager.removeFragment (tab.getPosition ( ));
             }
         });
     }
 
-    public class CustomPagerAdapter extends FragmentStatePagerAdapter {
+    public class CustomViewPagerAdapter extends FragmentStatePagerAdapter {
 
         private ArrayList<Fragment> fragments = new ArrayList<Fragment> ( );
         private ArrayList<String> fragmentsTitle = new ArrayList<String> ( );
 
-        public CustomPagerAdapter(@NonNull FragmentManager fm) {
+        CustomViewPagerAdapter(@NonNull FragmentManager fm) {
             super (fm);
         }
 
@@ -101,14 +97,14 @@ public class MainActivity extends AppCompatActivity {
             return fragments.get (position);
         }
 
-        public void addFragment(Fragment fragment, String title, int position) {
+        void addFragment(Fragment fragment, String title, int position) {
             fragments.add (fragment);
             fragmentsTitle.add (position, title);
             adapterViewPager.notifyDataSetChanged ( );
         }
 
 
-        public void removeFragment( int position) {
+        void removeFragment(int position) {
             fragments.remove (position);
             fragmentsTitle.remove (position);
             adapterViewPager.notifyDataSetChanged ( );
@@ -118,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public CharSequence getPageTitle(int position) {
             Drawable image = ContextCompat.getDrawable (MainActivity.this, R.drawable.close);
+            assert image != null;
             image.setBounds (0, 15, 60, 50);
             SpannableString sb = new SpannableString (" " + fragmentsTitle.get (position));
             ImageSpan imageSpan = new ImageSpan (image, ImageSpan.ALIGN_BASELINE);
